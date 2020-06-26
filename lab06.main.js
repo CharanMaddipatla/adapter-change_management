@@ -96,13 +96,11 @@ class ServiceNowAdapter extends EventEmitter {
 healthcheck(callback) {
  this.getRecord((result, error) => {
    if (error) {
-      this.emitOffline();
-      log.error("This adapter with "+ this.id +"is offline and recieved response is:" +error);
-    } else if (connector.isHibernating()) {
-      log.error("This adapter with "+ this.id +"is hibernating and recieved response is:" +error);
+      log.error('ServiceNow: ' + this.id + ' Instance is unavailable.');        
+      this.emitOffline((result, error) => callback(result, error));
     } else {
-      this.emitOnline();
-      log.debug("The adapter is up and running with the id as "+this.id + "and the result is: "+result);
+       log.debug('ServiceNow: Instance ' + this.id + ' is available.');
+       this.emitOnline((result, error) => callback(result, error));
    }
  });
 }

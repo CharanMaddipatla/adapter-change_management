@@ -103,6 +103,7 @@ processRequestResults(error, response, body, callback) {
     } else {
       callback.data = response;
     }
+    console.log(response);
     return callback(callback.data, callback.error);
 }
  
