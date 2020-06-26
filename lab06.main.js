@@ -159,8 +159,8 @@ healthcheck(callback) {
      * Note how the object was instantiated in the constructor().
      * get() takes a callback function.
      */
-     log.info(this.connector.get(callback));
-     
+     //const connector = new ServiceNowConnector(options);
+     this.connector.get(callback);
    /*  var getRecord = connector.get(data, error);
      window.myFunction = function() {
      console.log("myFunction is being called!");
@@ -184,7 +184,8 @@ healthcheck(callback) {
      * Note how the object was instantiated in the constructor().
      * post() takes a callback function.
      */
-     log.info(this.connector.post(callback));
+     //const connector = new ServiceNowConnector(options);
+     this.connector.post(callback);
   }
 }
 
