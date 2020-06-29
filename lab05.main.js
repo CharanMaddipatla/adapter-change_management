@@ -1,4 +1,4 @@
- // Import built-in Node.js package path.
+// Import built-in Node.js package path.
 const path = require('path');
 
 /**
@@ -66,6 +66,8 @@ class ServiceNowAdapter extends EventEmitter {
       password: this.props.auth.password,
       serviceNowTable: this.props.serviceNowTable
     });
+
+    
   }
 
   /**
@@ -152,14 +154,20 @@ class ServiceNowAdapter extends EventEmitter {
      * Note how the object was instantiated in the constructor().
      * get() takes a callback function.
      */
-     //const connector = new ServiceNowConnector(options);
-     console.log("getrecord");
-     this.connector.get(callback);
-   /*  var getRecord = connector.get(data, error);
-     window.myFunction = function() {
-     console.log("myFunction is being called!");
-     originalFunction();*/
+      const conn = new ServiceNowConnector({
+      url: this.props.url,
+      username: this.props.auth.username,
+      password: this.props.auth.password,
+      serviceNowTable: this.props.serviceNowTable
+    });
 
+    conn.get((data, error) => {
+    if (error) {
+      console.error(`\nError returned from GET request:\n${JSON.stringify(error)}`);
+    }
+    console.log(`\nResponse returned from GET request:\n${JSON.stringify(data)}`)
+  });
+    
   }
 
   /**
@@ -178,8 +186,12 @@ class ServiceNowAdapter extends EventEmitter {
      * Note how the object was instantiated in the constructor().
      * post() takes a callback function.
      */
-     //const connector = new ServiceNowConnector(options);
-     this.connector.post(callback);
+     this.connector.post(callback, (data, error) => {
+    if (error) {
+      console.error(`\nError returned from POST request:\n${JSON.stringify(error)}`);
+    }
+    console.log(`\nResponse returned from POST request:\n${JSON.stringify(data)}`)
+  });
   }
 }
 
