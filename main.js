@@ -123,6 +123,8 @@ healthcheck(callback) {
     * or the instance was hibernating. You must write
     * the blocks for each branch.
     */
+  //  log.info("****"+result+"******");
+    //log.info("****"+error+"******");
    if (error) {
      /**
       * Write this block.
@@ -135,7 +137,7 @@ healthcheck(callback) {
       * If an optional IAP callback function was passed to
       * healthcheck(), execute it passing the error seen as an argument
       * for the callback's errorMessage parameter.
-      */log.error('ServiceNow: Instance ' + this.id + ' is available.');
+      */log.error('ServiceNow: Instance ' + this.id + ' is unavailable.');
      this.emitOffline((result, error) => callback(result, error));
     
    } else {
@@ -209,32 +211,54 @@ healthcheck(callback) {
          * Note how the object was instantiated in the constructor().
          * get() takes a callback function.
          */
-        let response = this.connector.get(callback);
-        if (response && response !== null && typeof (response === 'object') && ('body' in response)) {
+        this.connector.get((response, error) => {
 
-            var result = response.body.result;
+            let callbackError = error;
+            let callBackData = response;
+            if (!error) {
 
-            for (var j = 0; j < result.length; j++) {
-                for (var key in result[j]) {
-                    if (result[j].hasOwnProperty(key)) {
-                        if (key === 'number'){
-                            result[j].change_ticket_number = result[j].number;
-                            delete result[j].number;
-                        }else if(key === 'sys_id'){
-                            result[j].change_ticket_key = result[j].sys_id;
-                            delete result[j].sys_id;
-                        }else if( key === 'active' || key === 'priority' || key === 'description' || key === 'work_start' || key === 'work_end') {
-                            continue;
-                        } else {
-                            delete result[j][key];
+                //  log.info('2***************No error*****************');
+                //  log.info('3*********** '+(typeof (response === 'object')));
+                //  log.info('4***********' +('body' in response));
+                //  log.info(response.body);
+                var result = null;
+                if (response && response !== null && typeof (response === 'object') && ('body' in response)) {
+
+                    var body = JSON.parse(response.body);
+                    // log.info('5***********' + JSON.stringify(body));
+                    result = body.result;
+                    // log.info('6***********' + result);
+                    // log.info('7***********' + JSON.stringify(result));
+                    if (result != null) {
+                        // log.info('1***************The result length is *****************');
+                        // log.info(result.length);
+                        for (var j = 0; j < result.length; j++) {
+                            for (var key in result[j]) {
+                                if (result[j].hasOwnProperty(key)) {
+                                    if (key === 'number') {
+                                        result[j].change_ticket_number = result[j].number;
+                                        delete result[j].number;
+                                    } else if (key === 'sys_id') {
+                                        result[j].change_ticket_key = result[j].sys_id;
+                                        delete result[j].sys_id;
+                                    } else if (key === 'active' || key === 'priority' || key === 'description' || key === 'work_start' || key === 'work_end') {
+                                        continue;
+                                    } else {
+                                        delete result[j][key];
+                                    }
+                                }
+                            }
                         }
                     }
-                }
-            }
-        }
-       
-       return result;
 
+                }
+
+                // log.info('8***************The result returned is *****************');
+                // log.info(JSON.stringify(result));
+                callBackData = result;
+            }
+            callback(callBackData, callbackError);
+        });
     }
 
 
@@ -277,40 +301,74 @@ healthcheck(callback) {
    *   handles the response.
    */
   postRecord(callback) {
-    /**
-     * Write the body for this function.
-     * The function is a wrapper for this.connector's post() method.
-     * Note how the object was instantiated in the constructor().
-     * post() takes a callback function.
-     */
-    var callOptions =  {
-      url: this.props.url,
-      username: this.props.auth.username,
-      password: this.props.auth.password,
-      serviceNowTable: this.props.serviceNowTable
-    };
-            let response = this.connector.post(callOptions, callback);
-            
-            if (response && response !== null && typeof (response === 'object') && ('body' in response)) 
-            {
-               
-                var result = response.body.result;
-               
-                for (var key in result) {
-                    if (key === 'number'){
-                            result.change_ticket_number = result.number;
-                            delete result.number;
-                        }else if(key === 'sys_id'){
-                            result.change_ticket_key = result.sys_id;
-                            delete result.sys_id;
-                        }else if( !(key === 'active' || key === 'priority' || key === 'description' || key === 'work_start' || key === 'work_end')) {
-                            delete result[key];
+        /**
+         * Write the body for this function.
+         * The function is a wrapper for this.connector's post() method.
+         * Note how the object was instantiated in the constructor().
+         * post() takes a callback function.
+         */
+        // let response = this.connector.post(callback);
+        // var result = null;
+        // if (response && response !== null && typeof (response === 'object') && ('body' in response)) {
+
+        //     result = response.body.result;
+
+        //     for (var key in result) {
+        //         if (result.hasOwnProperty(key)) {
+        //             if (key === 'number') {
+        //                 result.change_ticket_number = result.number;
+        //                 delete result[j].number;
+        //             } else if (key === 'sys_id') {
+        //                 result.change_ticket_key = result.sys_id;
+        //                 delete result.sys_id;
+        //             } else if (key === 'active' || key === 'priority' || key === 'description' || key === 'work_start' || key === 'work_end') {
+        //                 continue;
+        //             } else {
+        //                 delete result[key];
+        //             }
+        //         }
+        //     }
+        // }
+        // return result;
+
+        this.connector.post((response, error) => {
+            let callBackError = error;
+            let callBackData = response;
+            // log.info("***********Did not entered the if loop of post");
+            if (!error) {
+                //log.info("************entered the if loop of post");
+                var result = null;
+                if (response && response !== null && typeof (response === 'object') && ('body' in response)) {
+
+                    var body = JSON.parse(response.body);
+                    result = body.result;
+
+                    if (result != null) {
+                        for (var key in result) {
+                            if (result.hasOwnProperty(key)) {
+                                if (key === 'number') {
+                                    result.change_ticket_number = result.number;
+                                    delete result.number;
+                                } else if (key === 'sys_id') {
+                                    result.change_ticket_key = result.sys_id;
+                                    delete result.sys_id;
+                                } else if (key === 'active' || key === 'priority' || key === 'description' || key === 'work_start' || key === 'work_end') {
+                                    continue;
+                                } else {
+                                    delete result[key];
+                                }
+                            }
                         }
+                    }
                 }
-                
-                return result;
+               //  log.info('9***************The post result returned is *****************');
+                 log.info(JSON.stringify(result));
+                callBackData = result;
             }
-  }
+            callback(callBackData, callBackError);
+        });
+
+    }
 }
 
 module.exports = ServiceNowAdapter;

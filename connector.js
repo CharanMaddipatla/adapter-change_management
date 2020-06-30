@@ -105,8 +105,8 @@ constructUri(serviceNowTable, query = null) {
  *
  * @return {boolean} Returns true if instance is hibernating. Otherwise returns false.
  */
-isHibernating(response) {
-  return response.body.includes('Hibernating Instance')
+ isHibernating(response) {
+  return response.body.includes('Instance Hibernating page')
   && response.body.includes('<html>')
   && response.statusCode === 200;
 }
@@ -125,7 +125,7 @@ isHibernating(response) {
  *   Will be HTML text if hibernating instance.
  * @param {error} callback.error - The error property of callback.
  */
- processRequestResults(error, response, body, callback) {
+  processRequestResults(error, response, body, callback) {
   /**
    * You must build the contents of this function.
    * Study your package and note which parts of the get()
@@ -134,22 +134,27 @@ isHibernating(response) {
    * This function must not check for a hibernating instance;
    * it must call function isHibernating.
    */
-
+    // Initialize return arguments for callback
+  let callbackData = null;
+  let callbackError = null;
     if (error) {
       console.error('Error present.');
-      callback.error = error;
+      log.info('Error present.'+error);
+      callbackError = error;
     } else if (!validResponseRegex.test(response.statusCode)) {
       console.error('Bad response code.');
-      callback.error = response;
+      log.info('Bad response code.'+response);
+      callbackError = response;
     } else if (this.isHibernating(response)) {
-      callback.error = 'Service Now instance is hibernating';
-      console.error(callback.error);
+      callbackError = 'Service Now instance is hibernating';
+      log.info('Service Now instance is hibernating');
+      console.error(callbackError);
     } else {
-      callback.data = response;
+      log.info('********Got a response. ');
+      callbackData = response;
     }
-   
-    return callback(callback.data, callback.error);
-}
+    return callback(callbackData, callbackError);
+  }
 
 
 /**
@@ -209,7 +214,8 @@ isHibernating(response) {
  *   Will be HTML text if hibernating instance.
  * @param {error} callback.error - The error property of callback.
  */
- post(callOptions, callback) {
+ post(callback) {
+  let callOptions = this.options
   callOptions.method = 'POST';
   this.sendRequest(callOptions, (results, error) => callback(results, error));
 }
