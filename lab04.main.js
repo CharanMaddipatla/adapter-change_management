@@ -16,6 +16,7 @@ const path = require('path');
  * Built-in module path's join method constructs the absolute filename.
  */
 const ServiceNowConnector = require(path.join(__dirname, './connector.js'));
+
 /**
  * @function mainOnObject
  * @description Instantiates an object from the imported ServiceNowConnector class
@@ -28,16 +29,15 @@ function mainOnObject() {
   // You must write the arguments for get and post.
   connector.get((data, error) => {
     if (error) {
-     console.error(`\nError returned from GET request:\n${JSON.stringify(error)}`);
+      console.error(`\nError returned from GET request:\n${JSON.stringify(error)}`);
     }
-     console.log(`\nResponse returned from GET request:\n${JSON.stringify(data)}`)
+    console.log(`\nResponse returned from GET request:\n${JSON.stringify(data)}`)
   });
-  
-  connector.post((data, error) => {
+  connector.post(options, (data, error) => {
     if (error) {
-     console.error(`\nError returned from POST request:\n${JSON.stringify(error)}`);
+      console.error(`\nError returned from POST request:\n${JSON.stringify(error)}`);
     }
-     console.log(`\nResponse returned from POST request:\n${JSON.stringify(data)}`)
+    console.log(`\nResponse returned from POST request:\n${JSON.stringify(data)}`)
   });
 
 }
