@@ -1,8 +1,8 @@
 // Update this constant with your ServiceNow credentials
 const options = {
   url: 'https://developer.servicenow.com/app.do#!/instance?wu=true',
-  username: 'charan.maddipatla@centurylink.com',
-  password: 'Myleo@4450'
+  username: 'ca@centurylink.com',
+  password: 'Mpassword'
 };
 
 
